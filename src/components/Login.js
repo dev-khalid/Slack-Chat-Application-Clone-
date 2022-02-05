@@ -42,7 +42,7 @@ const Login = () => {
     }
     return x(); 
   },[])
- 
+ //ei time a ekbar state take amra set korbo . 
 
   const onFinish = () => {
     setLoading(true);
