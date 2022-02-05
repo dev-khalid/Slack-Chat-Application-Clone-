@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Row, Col, Card, Form, Button, Checkbox } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Row, Col, Card, Form, Button, Checkbox, Spin } from 'antd';
 import { Input } from 'antd';
 
 import {
@@ -8,15 +8,15 @@ import {
   MailOutlined,
   GoogleOutlined,
 } from '@ant-design/icons';
-import { NavLink } from 'react-router-dom';
+import { Navigate, NavLink, useNavigate } from 'react-router-dom';
 import '../Firebase';
 import {
   getAuth,
   signInWithPopup,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
+  onAuthStateChanged,
 } from 'firebase/auth';
-
 const auth = getAuth();
 
 const Login = () => {
@@ -24,19 +24,25 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [gloading, setGLoading] = useState(false);
-
-  // onAuthStateChanged(auth, (user) => {
-  //   if (user) {
-  //     // User is signed in, see docs for a list of available properties
-  //     // https://firebase.google.com/docs/reference/js/firebase.User
-  //     const uid = user.uid;
-  //     // ...
-  //   } else {
-  //     // User is signed out
-  //     // ...
-  //     console.log('signed out');
-  //   }
-  // });
+  const [componentLoading, setCL] = useState(true);
+  const navigate = useNavigate();
+  useEffect(() => { 
+    const x = () => { 
+       onAuthStateChanged(auth, (user) => {
+    
+    if (user) {
+      return navigate('/');
+    } else {
+      // User is signed out
+      // ...
+      console.log('signed out');
+    }
+    setCL(false);
+  });
+    }
+    return x(); 
+  },[])
+ 
 
   const onFinish = () => {
     setLoading(true);
@@ -86,107 +92,113 @@ const Login = () => {
   };
 
   return (
-    <Row>
-      <Col
-        sm={24}
-        md={{ span: 16, offset: 4 }}
-        lg={{ span: 12, offset: 6 }}
-        xl={{ span: 12, offset: 6 }}
-      >
-        <Card
-          title="Login To Slack"
-          bordered={true}
-          hoverable
-          align="center"
-          direction="vertical"
-        >
-          <Form
-            labelCol={{
-              span: 8,
-            }}
-            wrapperCol={{
-              span: 16,
-            }}
-            initialValues={{
-              remember: true,
-            }}
-            onFinish={onFinish}
-            autoComplete="off"
+    <>
+      {componentLoading ? (
+        <Spin size="large" tip="Wait Checking Login information..." />
+      ) : (
+        <Row>
+          <Col
+            sm={24}
+            md={{ span: 16, offset: 4 }}
+            lg={{ span: 12, offset: 6 }}
+            xl={{ span: 12, offset: 6 }}
           >
-            <Form.Item
-              label="Email"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please Enter your Email!',
-                },
-              ]}
+            <Card
+              title="Login To Slack"
+              bordered={true}
+              hoverable
+              align="center"
+              direction="vertical"
             >
-              <Input
-                size="large"
-                placeholder="large size"
-                value={email}
-                prefix={<MailOutlined />}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Password"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please Enter your password!',
-                },
-              ]}
-            >
-              <Input.Password
-                size="large"
-                placeholder="large size"
-                value={password}
-                prefix={<LockOutlined />}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Form.Item>
-
-            <Form.Item
-              wrapperCol={{
-                offset: 8,
-                span: 16,
-              }}
-            >
-              <Button loading={loading} type="primary" htmlType="submit">
-                Submit
-              </Button>
-              &nbsp;
-              <Button
-                loading={gloading}
-                type="primary"
-                onClick={googleSignInHandler}
-                danger
+              <Form
+                labelCol={{
+                  span: 8,
+                }}
+                wrapperCol={{
+                  span: 16,
+                }}
+                initialValues={{
+                  remember: true,
+                }}
+                onFinish={onFinish}
+                autoComplete="off"
               >
-                Sign In With Gooogle &nbsp;
-                <GoogleOutlined />
-              </Button>
-            </Form.Item>
-            <Form.Item
-              wrapperCol={{
-                offset: 8,
-                span: 16,
-              }}
-            >
-              &nbsp;
-              <span>
-                Don't Have An Account ?{' '}
-                <NavLink to="/register" type="primary">
-                  Register
-                </NavLink>
-              </span>
-            </Form.Item>
-          </Form>
-        </Card>
-      </Col>
-    </Row>
+                <Form.Item
+                  label="Email"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please Enter your Email!',
+                    },
+                  ]}
+                >
+                  <Input
+                    size="large"
+                    placeholder="large size"
+                    value={email}
+                    prefix={<MailOutlined />}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label="Password"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please Enter your password!',
+                    },
+                  ]}
+                >
+                  <Input.Password
+                    size="large"
+                    placeholder="large size"
+                    value={password}
+                    prefix={<LockOutlined />}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  wrapperCol={{
+                    offset: 8,
+                    span: 16,
+                  }}
+                >
+                  <Button loading={loading} type="primary" htmlType="submit">
+                    Submit
+                  </Button>
+                  &nbsp;
+                  <Button
+                    loading={gloading}
+                    type="primary"
+                    onClick={googleSignInHandler}
+                    danger
+                  >
+                    Sign In With Gooogle &nbsp;
+                    <GoogleOutlined />
+                  </Button>
+                </Form.Item>
+                <Form.Item
+                  wrapperCol={{
+                    offset: 8,
+                    span: 16,
+                  }}
+                >
+                  &nbsp;
+                  <span>
+                    Don't Have An Account ?{' '}
+                    <NavLink to="/register" type="primary">
+                      Register
+                    </NavLink>
+                  </span>
+                </Form.Item>
+              </Form>
+            </Card>
+          </Col>
+        </Row>
+      )}{' '}
+    </>
   );
 };
 
