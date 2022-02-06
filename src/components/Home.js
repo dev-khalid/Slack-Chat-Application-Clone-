@@ -25,17 +25,40 @@ import {
 } from '@ant-design/icons';
 import '../Firebase';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { getDatabase, ref, set, child, push, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserInfo } from '../actions/authActions';
+import { setCurrentChannelAction } from '../actions/channelActions';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Title } = Typography;
 const { SubMenu } = Menu;
 
+//
+//
+//
+
+//
+//
+//
+
+//
+//
+//
+
+//
+//
+//
+
 const Home = () => {
+  const db = getDatabase();
   const [visible, setVisible] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+
+  const [channels, setChannels] = useState([]);
+  const [channelName, setChannelName] = useState('');
+  const [channelDetails, setChannelDetails] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -67,14 +90,6 @@ const Home = () => {
     setVisible(true);
   };
 
-  // const handleOk = () => {
-  //   setConfirmLoading(true);
-  //   setTimeout(() => {
-  //     setVisible(false);
-  //     setConfirmLoading(false);
-  //   }, 2000);
-  // };
-
   const handleCancel = () => {
     setVisible(false);
   };
@@ -84,11 +99,57 @@ const Home = () => {
   //about channel form data
   const addChannelHandler = () => {
     setFormLoading(true);
-    setTimeout(() => {
-      setVisible(false);
-      setFormLoading(false);
-    }, 2000);
+
+    const key = push(child(ref(db), 'channels')).key;
+    const newChannel = {
+      name: channelName,
+      details: channelDetails,
+      id: key,
+      createdBy: {
+        name: user?.displayName,
+        avatar: user?.photoURL,
+      },
+    };
+
+    set(ref(db, 'channels/' + key), newChannel)
+      .then(() => {
+        setFormLoading(false);
+        setVisible(false);
+      })
+      .catch((err) => {
+        setFormLoading(false);
+        setVisible(false);
+        console.log('something error happened');
+      });
   };
+  useEffect(() => {
+    const unSubscribe = () => {
+      get(child(ref(db), 'channels/'))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const channelsData = Object.values(snapshot.val());
+            //selecting the first channel on page load .
+            if (channelsData.length > 0) {
+              dispatch(setCurrentChannelAction(channelsData[0]));
+            }
+            setChannels(channelsData);
+          } else {
+            console.log('No data available');
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+    return unSubscribe();
+  }, []);
+
+  const changeChannel = (channel) => {
+    dispatch(setCurrentChannelAction(channel));
+  };
+
+  const { currentChannel } = useSelector((state) => state.channel);
+
   return (
     <>
       <Layout hasSider>
@@ -111,7 +172,12 @@ const Home = () => {
               Slack
             </Title>
           </div>
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>
+          <Menu
+            theme="dark"
+            mode="inline"
+            defaultSelectedKeys={['channels', 'channel0']}
+            defaultOpenKeys={['channels']}
+          >
             <SubMenu
               key="sub1"
               icon={
@@ -134,15 +200,28 @@ const Home = () => {
               </Menu.Item>
             </SubMenu>
 
+            <SubMenu
+              key="channels"
+              icon={<VideoCameraOutlined />}
+              title="Channels"
+            >
+              {channels.length > 0 &&
+                channels.map((channel, idx) => (
+                  <Menu.Item
+                    key={`channel${idx}`}
+                    icon="# "
+                    onClick={() => changeChannel(channel)}
+                  >
+                    {channel.name}
+                  </Menu.Item>
+                ))}
+            </SubMenu>
             {/* </Menu.Item> */}
             <Menu.Item key="3" icon={<UploadOutlined />} onClick={showModal}>
               Add Channel
             </Menu.Item>
-            <Menu.Item key="2" icon={<VideoCameraOutlined />}>
-              Channels
-            </Menu.Item>
 
-            <Menu.Item key="4" icon={<BarChartOutlined />}>
+            {/* <Menu.Item key="4" icon={<BarChartOutlined />}>
               nav 4
             </Menu.Item>
             <Menu.Item key="5" icon={<CloudOutlined />}>
@@ -156,7 +235,7 @@ const Home = () => {
             </Menu.Item>
             <Menu.Item key="8" icon={<ShopOutlined />}>
               nav 8
-            </Menu.Item>
+            </Menu.Item> */}
           </Menu>
         </Sider>
         <Layout className="site-layout" style={{ marginLeft: 200 }}>
@@ -182,10 +261,18 @@ const Home = () => {
             >
               <Form layout="vertical">
                 <Form.Item label="Name Of Channel">
-                  <Input placeholder="Enter the name of the channel" />
+                  <Input
+                    value={channelName}
+                    onChange={(e) => setChannelName(e.target.value)}
+                    placeholder="Enter the name of the channel"
+                  />
                 </Form.Item>
                 <Form.Item label="About The Channel">
-                  <Input placeholder="Enter brief description about channel" />
+                  <Input
+                    value={channelDetails}
+                    onChange={(e) => setChannelDetails(e.target.value)}
+                    placeholder="Enter brief description about channel"
+                  />
                 </Form.Item>
               </Form>
             </Modal>
