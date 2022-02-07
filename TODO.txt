@@ -1,1 +1,1 @@
-1.user reducer in progress . 
+1.firebase servertime timestamp - moment.now() fromNow() on chat functionality. 

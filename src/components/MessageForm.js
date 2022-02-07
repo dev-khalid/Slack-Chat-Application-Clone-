@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input, Form, Button } from 'antd';
+import { Input, Form, Button,Upload } from 'antd';
 import {
   PlusOutlined,
   MailOutlined,
@@ -54,12 +54,15 @@ const MessageForm = ({ channelId, user }) => {
           >
             <MailOutlined /> Add Reply
           </Button>
-          <Button
-            type="danger"
-            style={{ fontWeight: 'bold', width: '49%', marginLeft: '2%' }}
-          >
-            <FileImageOutlined /> Upload Media
-          </Button>
+          <Upload name="logo" action="/upload.do" listType="picture">
+            {/* <Button icon={<UploadOutlined />}>Click to upload</Button> */}
+            <Button
+              type="danger"
+              style={{ fontWeight: 'bold', width: '49%', marginLeft: '2%' }}
+            >
+              <FileImageOutlined /> Upload Media
+            </Button>
+          </Upload>
         </Form.Item>
       </Form>
     </>

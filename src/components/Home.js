@@ -153,7 +153,7 @@ const Home = () => {
   };
 
   const { currentChannel } = useSelector((state) => state.channel);
-
+  console.log(currentChannel?.name);
   return (
     <>
       <Layout hasSider>
@@ -286,9 +286,7 @@ const Home = () => {
             >
               <Row>
                 <Col xs={{ span: 24 }} md={15}>
-                  { currentChannel && (
-                    <Message channelId={currentChannel.id} />
-                  )}
+                  {currentChannel && <Message channelId={currentChannel.id} />}
                 </Col>
                 <Col xs={{ span: 24 }} md={9}>
                   else
