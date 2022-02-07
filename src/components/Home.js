@@ -5,7 +5,8 @@ import {
   Typography,
   Avatar,
   Image,
-  Spin,
+  Row,
+  Col,
   Button,
   Modal,
   Form,
@@ -23,6 +24,9 @@ import {
   VideoCameraOutlined,
   MailOutlined,
 } from '@ant-design/icons';
+
+
+import MessageForm from './MessageForm'; 
 import '../Firebase';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { getDatabase, ref, set, child, push, get } from 'firebase/database';
@@ -30,6 +34,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserInfo } from '../actions/authActions';
 import { setCurrentChannelAction } from '../actions/channelActions';
+import Message from './Message';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Title } = Typography;
@@ -238,9 +243,9 @@ const Home = () => {
             </Menu.Item> */}
           </Menu>
         </Sider>
-        <Layout className="site-layout" style={{ marginLeft: 200 }}>
+        <Layout className="site-layout" style={{ marginLeft: 170 }}>
           {/* <Header className="site-layout-background" style={{ padding: 0 }} /> */}
-          <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+          <Content style={{ margin: '10px 10px 0 ', overflow: 'initial' }}>
             <Modal
               title="Add A Channel"
               visible={visible}
@@ -280,7 +285,15 @@ const Home = () => {
               className="site-layout-background"
               style={{ padding: 24, textAlign: 'center' }}
             >
-              content
+              <Row>
+                <Col xs={{ span: 24 }} md={15}>
+                  <Message />
+                </Col>
+                <Col xs={{ span: 24 }} md={9}>
+                  else
+                </Col>
+              </Row>
+              <MessageForm />
             </div>
           </Content>
           <Footer style={{ textAlign: 'center' }}>

@@ -1,11 +1,10 @@
-html, 
-body, 
-.app { 
-  height: 100vh; 
+html,
+body,
+.app {
+  height: 100vh;
   background: #eee;
-  padding: 1em; 
+  padding: 1em;
 }
-
 
 #components-layout-demo-fixed-sider .logo {
   height: 32px;
@@ -14,4 +13,22 @@ body,
 }
 .site-layout .site-layout-background {
   background: #fff;
+}
+ 
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.85); 
+  border-radius: 5px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #1890ff; 
+  border-radius: 10px;
 }
