@@ -25,8 +25,7 @@ import {
   MailOutlined,
 } from '@ant-design/icons';
 
-
-import MessageForm from './MessageForm'; 
+import MessageForm from './MessageForm';
 import '../Firebase';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { getDatabase, ref, set, child, push, get } from 'firebase/database';
@@ -287,13 +286,17 @@ const Home = () => {
             >
               <Row>
                 <Col xs={{ span: 24 }} md={15}>
-                  <Message />
+                  { currentChannel && (
+                    <Message channelId={currentChannel.id} />
+                  )}
                 </Col>
                 <Col xs={{ span: 24 }} md={9}>
                   else
                 </Col>
               </Row>
-              <MessageForm />
+              {!loading && currentChannel && (
+                <MessageForm user={user} channelId={currentChannel.id} />
+              )}
             </div>
           </Content>
           <Footer style={{ textAlign: 'center' }}>
